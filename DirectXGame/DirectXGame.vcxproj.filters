@@ -52,6 +52,12 @@
     <Filter Include="ソース ファイル\2d">
       <UniqueIdentifier>{814a0f6d-f847-4c45-856d-4688fa4c9e6c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="compute">
+      <UniqueIdentifier>{6a44b179-27ff-4367-a281-555f151b33ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\compute">
+      <UniqueIdentifier>{8397beef-1363-41a7-a8e5-5c37acc1fe53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -68,6 +74,12 @@
     </ClCompile>
     <ClCompile Include="2d\ImGuiManager.cpp">
       <Filter>ソース ファイル\2d</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="compute\compute.cpp">
+      <Filter>compute</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +169,12 @@
     </ClInclude>
     <ClInclude Include="base\StringUtility.h">
       <Filter>ヘッダー ファイル\base</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="compute\compute.h">
+      <Filter>ヘッダー ファイル\compute</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
