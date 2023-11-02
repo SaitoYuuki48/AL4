@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Model.h"
 #include "WorldTransform.h"
+#include "ViewProjection.h"
 
 class Player {
 public: // メンバ関数
@@ -18,7 +19,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(Model* model/*, uint32_t textureHandle*/);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -29,6 +30,21 @@ public: // メンバ関数
 	/// 描画
 	/// </summary>
 	void Draw(ViewProjection& viewProjection);
+
+	//プレイヤーを持たせる
+	void SetParent(const WorldTransform* parent);
+
+	const WorldTransform& GetWorldTransform();
+
+public:
+	// ワールド座標を取得
+	Vector3 GetWorldPosition();
+
+	void SetViewProjection(const ViewProjection* viewProjection);
+
+private:
+	// カメラのビュープロジェクション
+	const ViewProjection* viewProjection_ = nullptr;
 
 private:
 	Input* input_ = nullptr;

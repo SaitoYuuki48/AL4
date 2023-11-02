@@ -40,8 +40,14 @@ float Length(const Vector3& v) { return sqrtf(Dot(v, v)); }
 // 正規化
 Vector3 Normalize(const Vector3& v) {
 	float length = Length(v);
-	assert(length != 0.0f);
-	return {v.x / length, v.y / length, v.z / length};
+	Vector3 result = v;
+	if (length != 0) {
+		//result /= length;
+		result.x = result.x / length;
+		result.y = result.y / length;
+		result.z = result.z / length;
+	}
+	return result;
 }
 
 // 行列の加法

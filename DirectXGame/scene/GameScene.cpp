@@ -19,13 +19,14 @@ void GameScene::Initialize() {
 
 	//プレイヤー
 	// モデル
-	modelPlayer_.reset(Model::Create());
+	modelPlayer_.reset(Model::CreateFromOBJ("player", true));
+	//modelPlayer_.reset(Model::Create());
 	// ファイル名を指定してテクスチャを読み込む
-	playerTextureHandle_ = TextureManager::Load("player/player.png");
+	//playerTextureHandle_ = TextureManager::Load("player/player.png");
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer_.get(), playerTextureHandle_);
+	player_->Initialize(modelPlayer_.get());
 
 	//天球
 	// 3Dモデルの生成
@@ -43,6 +44,19 @@ void GameScene::Initialize() {
 	// 地面の初期化
 	ground_->Initialize(modelGround_.get());
 
+	// フォローカメラの生成
+	followCamera_ = std::make_unique<FollowCamera>();
+
+	followCamera_->Initialize();
+
+	// 自キャラのワールドトランスフォームを追従カメラにセット
+	followCamera_->SetTarget(&player_->GetWorldTransform());
+
+	player_->SetViewProjection(&followCamera_->GetViewProjection());
+
+	// 自キャラとレールカメラの親子関係を結ぶ
+	//player_->SetParent(&followCamera_->GetWorldTransform());
+
 #ifdef _DEBUG
 
 	// デバッグカメラの生成
@@ -57,6 +71,9 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
+	//フォローカメラ
+	followCamera_->Update();
+
 	// デバッグカメラ
 	debugCamera_->Update();
 
@@ -70,17 +87,31 @@ void GameScene::Update() {
 		isDebugCameraActive_ = false;
 	}
 
-	// カメラの処理
+	//// カメラの処理
+	//if (isDebugCameraActive_ == true) {
+	//	viewProjection_.matView = debugCamera_->GetViewProjection().matView;
+	//	viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
+	//	// ビュープロジェクション行列の転送
+	//	viewProjection_.TransferMatrix();
+	//} else {
+	//	// ビュープロジェクション行列の更新と転送
+	//	viewProjection_.UpdateMatrix();
+	//}
+#endif // _DEBUG
+
+	// カメラの処理 
 	if (isDebugCameraActive_ == true) {
 		viewProjection_.matView = debugCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 		// ビュープロジェクション行列の転送
 		viewProjection_.TransferMatrix();
-	} else {
-		// ビュープロジェクション行列の更新と転送
-		viewProjection_.UpdateMatrix();
 	}
-#endif // _DEBUG
+	else {
+		viewProjection_.matView = followCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = followCamera_->GetViewProjection().matProjection;
+		// ビュープロジェクション行列の転送
+		viewProjection_.TransferMatrix();
+	}
 
 	
 

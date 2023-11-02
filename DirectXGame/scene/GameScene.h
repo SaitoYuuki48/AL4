@@ -15,6 +15,7 @@
 #include "Player.h"
 #include "Skydome.h"
 #include "Ground.h"
+#include "FollowCamera.h"
 
 /// <summary>
 /// ゲームシーン
@@ -65,16 +66,18 @@ private: // メンバ変数
 	bool isDebugCameraActive_ = false;
 	// デバッグカメラ
 	std::unique_ptr<DebugCamera> debugCamera_; 
-	//DebugCamera* debugCamera_ = nullptr;
+	
+	// フォローカメラ
+	std::unique_ptr<FollowCamera> followCamera_;
 
 	// 自キャラ
 	 std::unique_ptr<Player> player_;
 	//Player* player_ = nullptr;
 	// 3Dモデル
 	 std::unique_ptr<Model> modelPlayer_;
-	//Model* playerModel_ = nullptr;
+	
 	// テクスチャハンドル
-	uint32_t playerTextureHandle_ = 0;
+	//uint32_t playerTextureHandle_ = 0;
 
 	// 天球
 	std::unique_ptr<Skydome> skydome_;
