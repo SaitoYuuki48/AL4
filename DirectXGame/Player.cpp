@@ -2,19 +2,26 @@
 #include "cassert"
 #include "ImGuiManager.h"
 #include "compute/compute.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 Player::Player() {}
 
 Player::~Player() {}
 
-void Player::Initialize(Model* model/*, uint32_t textureHandle*/) {
+void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm) {
 	input_ = Input::GetInstance();
 	
 	// 受け取ったモデルが読み込まれているかチェック
-	assert(model);
+	assert(modelBody);
+	assert(modelHead);
+	assert(modelL_arm);
+	assert(modelR_arm);
 	// 引数からモデルとテクスチャハンドルを受け取る
-	model_ = model;
-	//textureHandle_ = textureHandle;
+	modelFighterBody_ = modelBody;
+	modelFighterHead_ = modelHead;
+	modelFighterL_arm_ = modelL_arm;
+	modelFighterR_arm_ = modelR_arm;
 
 	// x,y,z方向のスケーリングを設定
 	worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
@@ -23,8 +30,13 @@ void Player::Initialize(Model* model/*, uint32_t textureHandle*/) {
 	// x,y,zの座標を設定
 	worldTransform_.translation_ = {0.0f, 2.5f, 0.0f};
 
+
+
 	// ワールドトランスフォーム初期化
 	worldTransform_.Initialize();
+
+	//浮遊ギミックの初期化
+	InitializeFloatingGimmick();
 }
 
 void Player::Update() { 
@@ -72,8 +84,19 @@ void Player::Update() {
 		// 移動量の速さを反映
 		move = Multiply(kCharacterSpeed, Normalize(move));
 
+		// カメラの角度から回転行列を計算する
+		Matrix4x4 rotateXMatrix = MakeRotateXmatrix(viewProjection_->rotation_.x);
+		Matrix4x4 rotateYMatrix = MakeRotateYmatrix(viewProjection_->rotation_.y);
+		Matrix4x4 rotateZMatrix = MakeRotateZmatrix(viewProjection_->rotation_.z);
+		Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+
 		// 移動量に速さを反映(0度の移動ベクトル)
-		move = Transform(move,)
+		move = Transform(move, rotateXYZMatrix);
+
+		// Y軸周りの角度(0y)
+		if (move.y != 0 || move.z != 0) {
+			worldTransform_.rotation_.y = std::atan2(move.x, move.z);
+		}
 
 		// 座標移動(ベクトルの加算)
 		worldTransform_.translation_.x += move.x;
@@ -100,6 +123,9 @@ void Player::Update() {
 	worldTransform_.translation_.y += move.y;
 	worldTransform_.translation_.z += move.z;
 
+	//浮遊ギミックの更新
+	UpdateFloatingGimmick();
+
 #ifdef _DEBUG
 	// キャラクターの座標を画面表示する処理
 	ImGui::Begin("Debug");
@@ -116,7 +142,10 @@ void Player::Update() {
 }
 
 void Player::Draw(ViewProjection& viewProjection) {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	modelFighterBody_->Draw(worldTransform_, viewProjection);
+	modelFighterHead_->Draw(worldTransform_, viewProjection);
+	modelFighterL_arm_->Draw(worldTransform_, viewProjection);
+	modelFighterR_arm_->Draw(worldTransform_, viewProjection);
 }
 
 void Player::SetParent(const WorldTransform* parent) {
@@ -127,6 +156,27 @@ void Player::SetParent(const WorldTransform* parent) {
 const WorldTransform& Player::GetWorldTransform() {
 	// TODO: return ステートメントをここに挿入します
 	return worldTransform_;
+}
+
+void Player::InitializeFloatingGimmick() { 
+	floatingParameter_ = 0.0f;
+}
+
+void Player::UpdateFloatingGimmick() {
+	//浮遊移動のサイクル<frame>
+	const uint16_t kPeriod = uint16_t(kFPS);
+	//1フレームでのパラメータ加算値
+	const float kStep = 2.0f * float(M_PI) / float(kPeriod);
+
+	//パラメータを1ステップ分加算
+	floatingParameter_ += kStep;
+	//2πを超えたら0に戻す
+	floatingParameter_ = std::fmod(floatingParameter_, 2.0f * float(M_PI));
+
+	// 浮遊の振幅<m>
+	const float floatingSwing = 0.1f;
+	//浮遊を座標に反映
+	worldTransform_.translation_.y = std::sin(floatingParameter_) * floatingSwing;
 }
 
 Vector3 Player::GetWorldPosition() {
@@ -140,6 +190,3 @@ Vector3 Player::GetWorldPosition() {
 	return worldPos;
 }
 
-void Player::SetViewProjection(const ViewProjection* viewProjection) {
-	viewProjection_ = viewProjection;
-}

@@ -19,14 +19,15 @@ void GameScene::Initialize() {
 
 	//プレイヤー
 	// モデル
-	modelPlayer_.reset(Model::CreateFromOBJ("player", true));
-	//modelPlayer_.reset(Model::Create());
-	// ファイル名を指定してテクスチャを読み込む
-	//playerTextureHandle_ = TextureManager::Load("player/player.png");
+	modelFighterBody_.reset(Model::CreateFromOBJ("float_Body", true));
+	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
+	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
+	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
+
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer_.get());
+	player_->Initialize(modelFighterBody_.get(),modelFighterHead_.get(),modelFighterL_arm_.get(),modelFighterR_arm_.get());
 
 	//天球
 	// 3Dモデルの生成

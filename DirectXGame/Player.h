@@ -5,6 +5,14 @@
 #include "ViewProjection.h"
 
 class Player {
+private:
+	enum ModelParts {
+		kBody,
+		kHead,
+		kL_arm,
+		kR_arm
+	};
+
 public: // メンバ関数
 	/// <summary>
 	/// コンストクラタ
@@ -19,7 +27,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model/*, uint32_t textureHandle*/);
+	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm);
 
 	/// <summary>
 	/// 毎フレーム処理
@@ -36,11 +44,20 @@ public: // メンバ関数
 
 	const WorldTransform& GetWorldTransform();
 
+private:
+	//浮遊ギミック初期化
+	void InitializeFloatingGimmick();
+
+	//浮遊ギミック更新
+	void UpdateFloatingGimmick();
+
 public:
 	// ワールド座標を取得
 	Vector3 GetWorldPosition();
 
-	void SetViewProjection(const ViewProjection* viewProjection);
+	void SetViewProjection(const ViewProjection* viewProjection) {
+		viewProjection_ = viewProjection;
+	}
 
 private:
 	// カメラのビュープロジェクション
@@ -51,8 +68,19 @@ private:
 
 	// ワールド変換データ
 	WorldTransform worldTransform_;
+
 	// モデル
-	Model* model_ = nullptr;
+	Model* modelFighterBody_;
+	Model* modelFighterHead_;
+	Model* modelFighterL_arm_;
+	Model* modelFighterR_arm_;
+
 	// テクスチャハンドル
 	uint32_t textureHandle_ = 0;
+
+	//浮遊ギミックの媒介変数
+	float floatingParameter_ = 0.0f;
+
+	//フレーム数
+	const float kFPS = 60.0f;
 };
