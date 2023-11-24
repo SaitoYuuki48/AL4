@@ -39,9 +39,6 @@ public: // メンバ関数
 	/// </summary>
 	void Draw(ViewProjection& viewProjection);
 
-	//プレイヤーを持たせる
-	void SetParent(const WorldTransform* parent);
-
 	const WorldTransform& GetWorldTransform();
 
 private:
@@ -50,6 +47,8 @@ private:
 
 	//浮遊ギミック更新
 	void UpdateFloatingGimmick();
+
+	void UpdateArmAnimation();
 
 public:
 	// ワールド座標を取得
@@ -67,7 +66,12 @@ private:
 	Input* input_ = nullptr;
 
 	// ワールド変換データ
-	WorldTransform worldTransform_;
+	WorldTransform worldTransformBase_;
+	WorldTransform worldTransformBody_;
+	WorldTransform worldTransformHead_;
+	WorldTransform worldTransformL_arm_;
+	WorldTransform worldTransformR_arm_;
+
 
 	// モデル
 	Model* modelFighterBody_;
@@ -81,6 +85,11 @@ private:
 	//浮遊ギミックの媒介変数
 	float floatingParameter_ = 0.0f;
 
+	//腕のアニメーションの変数
+	float armParameter_ = 0.0f;
+
 	//フレーム数
-	const float kFPS = 60.0f;
+	const float kFloatingFPS = 60.0f;
+
+	const float kArmFPS = 60.0f;
 };
