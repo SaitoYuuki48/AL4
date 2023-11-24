@@ -231,9 +231,9 @@ void Player::UpdateArmAnimation() {
 	// 1フレームでのパラメータ加算値
 	const float kStep = 2.0f * float(M_PI) / float(kPeriod);
 
-	// 
+	// パラメータを1ステップ分加算
 	armParameter_ += kStep;
-	//
+	//2πを超えたら0に戻す
 	armParameter_ = std::fmod(armParameter_, 2.0f * float(M_PI));
 
 	//振幅
