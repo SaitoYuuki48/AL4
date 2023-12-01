@@ -4,7 +4,9 @@
 #include "WorldTransform.h"
 #include "ViewProjection.h"
 
-class Player {
+#include "BaseCharacter.h"
+
+class Player : public BaseCharacter {
 private:
 	enum ModelParts {
 		kBody,
@@ -27,7 +29,7 @@ public: // メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm);
+	void Initialize(const std::vector<Model*>& models) override;
 
 	/// <summary>
 	/// 毎フレーム処理

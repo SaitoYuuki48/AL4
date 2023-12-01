@@ -9,19 +9,22 @@ Player::Player() {}
 
 Player::~Player() {}
 
-void Player::Initialize(Model* modelBody, Model* modelHead, Model* modelL_arm, Model* modelR_arm) {
+void Player::Initialize(const std::vector<Model*>& models) {
 	input_ = Input::GetInstance();
+
+	//基底クラスの初期化
+	BaseCharacter::Initialize(models);
 	
-	// 受け取ったモデルが読み込まれているかチェック
-	assert(modelBody);
-	assert(modelHead);
-	assert(modelL_arm);
-	assert(modelR_arm);
-	// 引数からモデルとテクスチャハンドルを受け取る
-	modelFighterBody_ = modelBody;
-	modelFighterHead_ = modelHead;
-	modelFighterL_arm_ = modelL_arm;
-	modelFighterR_arm_ = modelR_arm;
+	//// 受け取ったモデルが読み込まれているかチェック
+	//assert(modelBody);
+	//assert(modelHead);
+	//assert(modelL_arm);
+	//assert(modelR_arm);
+	//// 引数からモデルとテクスチャハンドルを受け取る
+	//modelFighterBody_ = modelBody;
+	//modelFighterHead_ = modelHead;
+	//modelFighterL_arm_ = modelL_arm;
+	//modelFighterR_arm_ = modelR_arm;
 
 	// x,y,z方向のスケーリングを設定
 	worldTransformBase_.scale_ = {1.0f, 1.0f, 1.0f};
@@ -206,8 +209,6 @@ void Player::UpdateFloatingGimmick() {
 	ImGui::SliderFloat3("Head Translation", head, -10.0f, 10.0f);
 	ImGui::SliderFloat3("ArmL Translation", L_arm, -10.0f, 10.0f);
 	ImGui::SliderFloat3("ArmR Translation", R_arm, -10.0f, 10.0f);
-	//ImGui::SliderFloat3("Period", kPeriod, 0.0f, 10.0f);
-	//ImGui::SliderFloat3("floatingSwing", floatingSwing, 0.0f, 10.0f);
 
 	ImGui::End();
 
