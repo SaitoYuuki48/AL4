@@ -44,6 +44,8 @@ Matrix4x4 MakeIdentity4x4();
 // 平行移動
 Matrix4x4 MakeTranslateMatrix(Vector3 translate);
 
+Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
 // 座標変換
 Vector3 Transform(Vector3 vector, Matrix4x4 matrix);
 

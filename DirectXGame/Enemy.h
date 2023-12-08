@@ -49,13 +49,18 @@ private:
 	WorldTransform worldTransformL_arm_;
 	WorldTransform worldTransformR_arm_;
 
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
 	// モデル
 	Model* modelFighterBody_;
 	Model* modelFighterL_arm_;
 	Model* modelFighterR_arm_;
 
 	// 速度
-	Vector3 velocity_;
+	Vector3 move;
+
+	// 追従対象
+	const ViewProjection* target_ = nullptr;
 
 	// フェーズ
 	Phase phase_ = Phase::Approach;

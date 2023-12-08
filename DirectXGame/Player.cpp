@@ -122,10 +122,10 @@ void Player::Update() {
 	//worldTransformBase_.translation_.y = max(worldTransformBase_.translation_.y, -kMoveLimitY);
 	//worldTransformBase_.translation_.y = min(worldTransformBase_.translation_.y, +kMoveLimitY);
 
-	// 座標移動(ベクトルの加算)
-	worldTransformBase_.translation_.x += move.x;
-	worldTransformBase_.translation_.y += move.y;
-	worldTransformBase_.translation_.z += move.z;
+	//// 座標移動(ベクトルの加算)
+	//worldTransformBase_.translation_.x += move.x;
+	//worldTransformBase_.translation_.y += move.y;
+	//worldTransformBase_.translation_.z += move.z;
 
 	//浮遊ギミックの更新
 	UpdateFloatingGimmick();

@@ -1,4 +1,5 @@
 ﻿#include "Enemy.h"
+#include "compute/compute.h"
 
 void Enemy::Initialize(const std::vector<Model*>& models)
 {
@@ -7,14 +8,14 @@ void Enemy::Initialize(const std::vector<Model*>& models)
 	// x,y,z方向の回転を設定
 	worldTransformBase_.rotation_ = {0.0f, 0.0f, 0.0f};
 	// x,y,zの座標を設定
-	worldTransformBase_.translation_ = {0.0f, 0.0f, 0.0f};
+	worldTransformBase_.translation_ = {-5.0f, 0.0f, 5.0f};
 
 	worldTransformBody_.translation_ = {0.0f, 0.0f, 0.0f};
 	worldTransformL_arm_.translation_ = {-0.9f, 1.0f, 0.0f};
 	worldTransformR_arm_.translation_ = {0.9f, 1.0f, 0.0f};
 
-	velocity_ = {0.0f, 0.0f, 0.3f};
-
+	move = {0.0f, 0.0f, 0.0f};
+	
 	// 基底クラスの初期化
 	BaseCharacter::Initialize(models);
 
@@ -31,14 +32,36 @@ void Enemy::Update() {
 	worldTransformL_arm_.parent_ = &worldTransformBody_;
 	worldTransformR_arm_.parent_ = &worldTransformBody_;
 
-	switch (phase_) {
-	case Phase::Approach: // 接近
-		Approach();
-		break;
-	case Phase::Leave: // 離脱
-		Leave();
-		break;
-	}
+	//switch (phase_) {
+	//case Phase::Approach: // 接近
+	//	Approach();
+	//	break;
+	//case Phase::Leave: // 離脱
+	//	Leave();
+	//	break;
+	//}
+
+	worldTransformBase_.rotation_.y += 0.01f;
+
+
+	// カメラの角度から回転行列を計算する
+	Matrix4x4 rotateXMatrix = MakeRotateXmatrix(worldTransformBase_.rotation_.x);
+	Matrix4x4 rotateYMatrix = MakeRotateYmatrix(worldTransformBase_.rotation_.y);
+	Matrix4x4 rotateZMatrix = MakeRotateZmatrix(worldTransformBase_.rotation_.z);
+	Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+	
+	// 速度　回転
+	const float speed = 0.1f;
+	move = {0.0f,0.0f,speed};
+
+	// オフセットをカメラの回転に合わせて回転させる
+	move = TransformNormal(move, rotateYMatrix);
+
+	// 座標移動(ベクトルの加算)
+	 worldTransformBase_.translation_.x += move.x;
+	 worldTransformBase_.translation_.y += move.y;
+	 worldTransformBase_.translation_.z += move.z;
+
 
 	// ワールド行列の更新
 	worldTransformBase_.UpdateMatrix();
@@ -54,20 +77,20 @@ void Enemy::Draw(ViewProjection& viewProjection) {
 	models_[kModelIndexR_arm]->Draw(worldTransformR_arm_, viewProjection);
 }
 
-void Enemy::Approach() {
-	// 移動(ベクトルを加算)
-	worldTransformBase_.translation_.z += velocity_.z;
-	// 規定の位置に到達したら離脱
-	if (worldTransformBase_.translation_.z > 100.0f) {
-		phase_ = Phase::Leave;
-	}
-}
-
-void Enemy::Leave() {
-	// 移動(ベクトルを加算)
-	worldTransformBase_.translation_.z -= velocity_.z;
-	// 規定の位置に到達したら離脱
-	if (worldTransformBase_.translation_.z < 0.0f) {
-		phase_ = Phase::Approach;
-	}
-}
+//void Enemy::Approach() {
+//	// 移動(ベクトルを加算)
+//	worldTransformBase_.translation_.z += move.z;
+//	// 規定の位置に到達したら離脱
+//	if (worldTransformBase_.translation_.z > 100.0f) {
+//		phase_ = Phase::Leave;
+//	}
+//}
+//
+//void Enemy::Leave() {
+//	// 移動(ベクトルを加算)
+//	worldTransformBase_.translation_.z -= move.z;
+//	// 規定の位置に到達したら離脱
+//	if (worldTransformBase_.translation_.z < 0.0f) {
+//		phase_ = Phase::Approach;
+//	}
+//}
