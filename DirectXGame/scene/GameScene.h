@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "Player.h"
+#include "Enemy.h"
 #include "Skydome.h"
 #include "Ground.h"
 #include "FollowCamera.h"
@@ -74,12 +75,18 @@ private: // メンバ変数
 	 std::unique_ptr<Player> player_;
 	//Player* player_ = nullptr;
 	// 3Dモデル
-	 //std::unique_ptr<Model> modelPlayer_;
-	 std::unique_ptr<Model> modelFighterBody_;
-	 std::unique_ptr<Model> modelFighterHead_;
-	 std::unique_ptr<Model> modelFighterL_arm_;
-	 std::unique_ptr<Model> modelFighterR_arm_;
+	//std::unique_ptr<Model> modelPlayer_;
+	std::unique_ptr<Model> modelFighterBody_;
+	std::unique_ptr<Model> modelFighterHead_;
+	std::unique_ptr<Model> modelFighterL_arm_;
+	std::unique_ptr<Model> modelFighterR_arm_;
 
+	//敵キャラ
+	std::unique_ptr<Enemy> enemy_;
+	//モデル
+	std::unique_ptr<Model> modelEnemyBody_;
+	std::unique_ptr<Model> modelEnemyL_arm_;
+	std::unique_ptr<Model> modelEnemyR_arm_;
 	
 	// テクスチャハンドル
 	//uint32_t playerTextureHandle_ = 0;

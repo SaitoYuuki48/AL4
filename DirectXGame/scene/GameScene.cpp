@@ -23,11 +23,25 @@ void GameScene::Initialize() {
 	modelFighterHead_.reset(Model::CreateFromOBJ("float_Head", true));
 	modelFighterL_arm_.reset(Model::CreateFromOBJ("float_L_arm", true));
 	modelFighterR_arm_.reset(Model::CreateFromOBJ("float_R_arm", true));
+	std::vector<Model*> playerModels = {
+	    modelFighterBody_.get(), modelFighterHead_.get(), modelFighterL_arm_.get(),
+	    modelFighterR_arm_.get()};
 
 	// 自キャラの生成
 	player_ = std::make_unique<Player>();
 	// 自キャラの初期化
-	player_->Initialize(modelFighterBody_.get(),modelFighterHead_.get(),modelFighterL_arm_.get(),modelFighterR_arm_.get());
+	player_->Initialize(playerModels);
+
+	modelEnemyBody_.reset(Model::CreateFromOBJ("needle_Body", true));
+	modelEnemyL_arm_.reset(Model::CreateFromOBJ("needle_L_arm", true));
+	modelEnemyR_arm_.reset(Model::CreateFromOBJ("needle_R_arm", true));
+	std::vector<Model*> enemyModels = {
+	    modelEnemyBody_.get(), modelEnemyL_arm_.get(), modelEnemyR_arm_.get()};
+	// 敵キャラの生成
+	enemy_ = std::make_unique<Enemy>();
+
+	//敵キャラの初期化
+	enemy_->Initialize(enemyModels);
 
 	//天球
 	// 3Dモデルの生成
@@ -119,6 +133,9 @@ void GameScene::Update() {
 	// 自キャラの更新
 	player_->Update();
 
+	// 敵キャラの更新
+	enemy_->Update();
+
 	// 天球の更新
 	skydome_->Update();
 
@@ -155,6 +172,9 @@ void GameScene::Draw() {
 
 	// 自キャラの描画
 	player_->Draw(viewProjection_);
+
+	//敵キャラの描画
+	enemy_->Draw(viewProjection_);
 
 	// 天球の描画
 	skydome_->Draw(viewProjection_);

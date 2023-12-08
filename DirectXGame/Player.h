@@ -9,10 +9,10 @@
 class Player : public BaseCharacter {
 private:
 	enum ModelParts {
-		kBody,
-		kHead,
-		kL_arm,
-		kR_arm
+		kModelIndexBody, 
+		kModelIndexHead,
+		kModelIndexL_arm,
+		kModelIndexR_arm
 	};
 
 public: // メンバ関数
@@ -34,12 +34,12 @@ public: // メンバ関数
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
+	void Update() override;
 
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(ViewProjection& viewProjection);
+	void Draw(const ViewProjection& viewProjection) override;
 
 	const WorldTransform& GetWorldTransform();
 
@@ -82,7 +82,7 @@ private:
 	Model* modelFighterR_arm_;
 
 	// テクスチャハンドル
-	uint32_t textureHandle_ = 0;
+	//uint32_t textureHandle_ = 0;
 
 	//浮遊ギミックの媒介変数
 	float floatingParameter_ = 0.0f;

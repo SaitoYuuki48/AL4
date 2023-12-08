@@ -11,21 +11,7 @@ Player::~Player() {}
 
 void Player::Initialize(const std::vector<Model*>& models) {
 	input_ = Input::GetInstance();
-
-	//基底クラスの初期化
-	BaseCharacter::Initialize(models);
 	
-	//// 受け取ったモデルが読み込まれているかチェック
-	//assert(modelBody);
-	//assert(modelHead);
-	//assert(modelL_arm);
-	//assert(modelR_arm);
-	//// 引数からモデルとテクスチャハンドルを受け取る
-	//modelFighterBody_ = modelBody;
-	//modelFighterHead_ = modelHead;
-	//modelFighterL_arm_ = modelL_arm;
-	//modelFighterR_arm_ = modelR_arm;
-
 	// x,y,z方向のスケーリングを設定
 	worldTransformBase_.scale_ = {1.0f, 1.0f, 1.0f};
 	// x,y,z方向の回転を設定
@@ -36,6 +22,9 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformHead_.translation_ = {0.0f, 1.5f, 0.0f};
 	worldTransformL_arm_.translation_ = {-0.5f, 1.3f, 0.0f}; 
 	worldTransformR_arm_.translation_ = {0.5f, 1.3f, 0.0f};
+
+	//基底クラスの初期化
+	BaseCharacter::Initialize(models);
 
 	// ワールドトランスフォーム初期化
 	worldTransformBase_.Initialize();
@@ -49,9 +38,7 @@ void Player::Initialize(const std::vector<Model*>& models) {
 }
 
 void Player::Update() { 
-	// ワールド行列の更新
-	//worldTransform_.UpdateMatrix();
-
+	// 親子関係
 	worldTransformBody_.parent_ = &worldTransformBase_;
 	worldTransformHead_.parent_ = &worldTransformBody_;
 	worldTransformL_arm_.parent_ = &worldTransformBody_;
@@ -86,9 +73,7 @@ void Player::Update() {
 
 	// ゲームパッド状態取得
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		/*move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed;
-		move.z += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed;*/
-
+		
 		// 移動量
 		move = {
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed,
@@ -163,11 +148,16 @@ void Player::Update() {
 #endif // _DEBUG
 }
 
-void Player::Draw(ViewProjection& viewProjection) {
-	modelFighterBody_->Draw(worldTransformBody_, viewProjection);
+void Player::Draw(const ViewProjection& viewProjection) {
+	models_[kModelIndexBody]->Draw(worldTransformBody_, viewProjection);
+	models_[kModelIndexHead]->Draw(worldTransformHead_, viewProjection);
+	models_[kModelIndexL_arm]->Draw(worldTransformL_arm_, viewProjection);
+	models_[kModelIndexR_arm]->Draw(worldTransformR_arm_, viewProjection);
+
+	/*modelFighterBody_->Draw(worldTransformBody_, viewProjection);
 	modelFighterHead_->Draw(worldTransformHead_, viewProjection);
 	modelFighterL_arm_->Draw(worldTransformL_arm_, viewProjection);
-	modelFighterR_arm_->Draw(worldTransformR_arm_, viewProjection);
+	modelFighterR_arm_->Draw(worldTransformR_arm_, viewProjection);*/
 }
 
 const WorldTransform& Player::GetWorldTransform() {

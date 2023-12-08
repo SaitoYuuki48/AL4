@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include <input.h>
 
 /// <summary>
 /// 追従カメラ
@@ -29,6 +30,8 @@ public:
 	const WorldTransform& GetWorldTransform() { return worldTransform_; }
 
 private:
+	Input* input_ = nullptr;
+
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 	//ビュープロジェクション

@@ -2,7 +2,6 @@
 #include "ImGuiManager.h"
 
 #include "compute/compute.h"
-#include <input.h>
 
 void FollowCamera::Initialize() {
 
