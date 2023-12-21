@@ -71,26 +71,8 @@ void Enemy::Update() {
 	worldTransformR_arm_.UpdateMatrix();
 }
 
-void Enemy::Draw(ViewProjection& viewProjection) {
+void Enemy::Draw(const ViewProjection& viewProjection) {
 	models_[kModelIndexBody]->Draw(worldTransformBody_, viewProjection);
 	models_[kModelIndexL_arm]->Draw(worldTransformL_arm_, viewProjection);
 	models_[kModelIndexR_arm]->Draw(worldTransformR_arm_, viewProjection);
 }
-
-//void Enemy::Approach() {
-//	// 移動(ベクトルを加算)
-//	worldTransformBase_.translation_.z += move.z;
-//	// 規定の位置に到達したら離脱
-//	if (worldTransformBase_.translation_.z > 100.0f) {
-//		phase_ = Phase::Leave;
-//	}
-//}
-//
-//void Enemy::Leave() {
-//	// 移動(ベクトルを加算)
-//	worldTransformBase_.translation_.z -= move.z;
-//	// 規定の位置に到達したら離脱
-//	if (worldTransformBase_.translation_.z < 0.0f) {
-//		phase_ = Phase::Approach;
-//	}
-//}

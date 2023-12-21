@@ -18,7 +18,10 @@ public:
 	/// </summary>
 	void Update();
 
+public:
 	void SetTarget(const WorldTransform* target) { target_ = target; }
+
+
 
 public:
 	/// <summary>

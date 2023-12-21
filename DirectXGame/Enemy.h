@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Model.h"
-#include "ViewProjection.h"
 #include "WorldTransform.h"
 
 #include "BaseCharacter.h"
@@ -28,29 +27,23 @@ public:
 	/// <summary>
 	/// 毎フレーム処理
 	/// </summary>
-	void Update();
+	void Update() override;
 
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(ViewProjection& viewProjection);
+	void Draw(const ViewProjection& viewProjection) override;
 
 private:
-	// 接近する
-	void Approach();
-	// 離脱する
-	void Leave();
+
 
 private:
-	// ワールド変換データ
 	// ワールド変換データ
 	WorldTransform worldTransformBase_;
 	WorldTransform worldTransformBody_;
 	WorldTransform worldTransformL_arm_;
 	WorldTransform worldTransformR_arm_;
 
-	// ビュープロジェクション
-	ViewProjection viewProjection_;
 	// モデル
 	Model* modelFighterBody_;
 	Model* modelFighterL_arm_;
