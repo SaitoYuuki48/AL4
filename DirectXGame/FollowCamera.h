@@ -21,7 +21,10 @@ public:
 public:
 	void SetTarget(const WorldTransform* target) { target_ = target; }
 
+	static void SetShakeFlag(bool shakeFlag) { shakeFlag_ = shakeFlag; }
 
+private:
+	void CameraShake();
 
 public:
 	/// <summary>
@@ -42,4 +45,6 @@ private:
 
 	//追従対象
 	const WorldTransform* target_ = nullptr;
+
+	static bool shakeFlag_; 
 };

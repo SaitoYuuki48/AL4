@@ -1,7 +1,11 @@
 ﻿#include "FollowCamera.h"
 #include "ImGuiManager.h"
 
+#include <stdlib.h>
+
 #include "compute/compute.h"
+
+bool FollowCamera::shakeFlag_ = false;
 
 void FollowCamera::Initialize() {
 
@@ -15,22 +19,26 @@ void FollowCamera::Initialize() {
 
 void FollowCamera::Update() {
 
-	//追従対象がいれば
+	// 追従対象がいれば
 	if (target_) {
-		//追従対象カメラまでのオフセット
+		// 追従対象カメラまでのオフセット
 		Vector3 offset = {0.0f, 2.0f, -20.0f};
 
-		//カメラの角度から回転行列を計算する
+		// カメラの角度から回転行列を計算する
 		Matrix4x4 rotateXMatrix = MakeRotateXmatrix(viewProjection_.rotation_.x);
 		Matrix4x4 rotateYMatrix = MakeRotateYmatrix(viewProjection_.rotation_.y);
 		Matrix4x4 rotateZMatrix = MakeRotateZmatrix(viewProjection_.rotation_.z);
 		Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
 
-		//オフセットをカメラの回転に合わせて回転させる
+		// オフセットをカメラの回転に合わせて回転させる
 		offset = Transform(offset, rotateXYZMatrix);
 
-		//座標をコピーしてオフセット分、ずらす
+		// 座標をコピーしてオフセット分、ずらす
 		viewProjection_.translation_ = Add(target_->translation_, offset);
+	}
+
+	if (shakeFlag_ == true) {
+		CameraShake();
 	}
 
 	// ゲームパッドの状態を得る変数(XINPUT)
@@ -43,5 +51,24 @@ void FollowCamera::Update() {
 		viewProjection_.rotation_.y += (float)joyState.Gamepad.sThumbRX / SHRT_MAX * rotationSpeed;
 	}
 
-	 viewProjection_.UpdateMatrix();
+	viewProjection_.UpdateMatrix();
+}
+
+void FollowCamera::CameraShake() {
+	int shakeTime = 30;
+
+	Vector3 rand3 = {0, 0, 0};
+
+	// シェイク
+	if (shakeTime >= 0) {
+		rand3.x = rand() % 2 - 1.0f;
+		rand3.y = rand() % 2 - 1.0f;
+		shakeTime -= 1;
+	}
+
+	if (shakeTime <= 0) {
+		shakeTime = 30;
+	}
+
+	viewProjection_.translation_ = Add(rand3, viewProjection_.translation_);
 }

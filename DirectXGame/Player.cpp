@@ -26,6 +26,13 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformR_arm_.translation_ = {0.5f, 1.3f, 0.0f};
 	worldTransformWeapon_.translation_ = {0.0f, 2.0f, 0.0f};
 
+	// 親子関係
+	worldTransformBody_.parent_ = &worldTransformBase_;
+	worldTransformHead_.parent_ = &worldTransformBody_;
+	worldTransformL_arm_.parent_ = &worldTransformBody_;
+	worldTransformR_arm_.parent_ = &worldTransformBody_;
+	worldTransformWeapon_.parent_ = &worldTransformBody_;
+
 	// 基底クラスの初期化
 	BaseCharacter::Initialize(models);
 
@@ -42,12 +49,7 @@ void Player::Initialize(const std::vector<Model*>& models) {
 }
 
 void Player::Update() {
-	// 親子関係
-	worldTransformBody_.parent_ = &worldTransformBase_;
-	worldTransformHead_.parent_ = &worldTransformBody_;
-	worldTransformL_arm_.parent_ = &worldTransformBody_;
-	worldTransformR_arm_.parent_ = &worldTransformBody_;
-	worldTransformWeapon_.parent_ = &worldTransformBody_;
+	
 
 #ifdef _DEBUG
 	// キャラクターの座標を画面表示する処理
@@ -308,9 +310,10 @@ void Player::BehaviorAttackUpdate() {
 	} else if (attack_.time >= attack_.kAttackAllFrame) {
 		attack_.time = 0.0f;
 		behaviorRequest_ = Behavior::kRoot;
+		FollowCamera::SetShakeFlag(false);
 	} else if (attack_.time >= attack_.kAnimMaxTime) {
 		// アニメーションが終わったらカメラを揺らす
-		// FollowCamera::SetShakeFlag(true);
+		FollowCamera::SetShakeFlag(true);
 	}
 }
 
