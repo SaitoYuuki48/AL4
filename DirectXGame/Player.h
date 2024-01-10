@@ -20,6 +20,7 @@ private:
 	enum class Behavior {
 		kRoot, // 通常状態
 		kAttack, //攻撃中
+		kJump, // ジャンプ中
 	};
 
 public: // メンバ関数
@@ -59,7 +60,7 @@ private:
 
 	//腕のアニメーションの初期化
 	void InitializeArmAnimation();
-
+	//腕のアニメーションの更新
 	void UpdateArmAnimation();
 
 	//通常攻撃初期化
@@ -73,9 +74,10 @@ private:
 	//攻撃行動更新
 	void BehaviorAttackUpdate();
 
-	/*void (Player::* Player::pBehaviorUpdateTable[])() = {
-
-	}*/
+	//ジャンプ行動初期化
+	void BehaviorJumpInitialize();
+	//ジャンプ行動更新
+	void BehaviorJumpUpdate();
 
 public:
 	// ワールド座標を取得
@@ -84,6 +86,8 @@ public:
 	void SetViewProjection(const ViewProjection* viewProjection) {
 		viewProjection_ = viewProjection;
 	}
+
+	void PositionReset();
 
 private:
 	Input* input_ = nullptr;
@@ -120,17 +124,26 @@ private:
 	const float kArmFPS = 60.0f;
 
 	//攻撃のアニメーションの変数
-	struct AttackAnimation {
+	struct Animation {
 		float time;
 		const int kAnimMaxTime;
-		const int kAttackAllFrame;
+		const int kAllFrame;
 	};
 
-	AttackAnimation attack_{
+	Animation attack_{
 		60.0f,
 		60,
 		90
 	};
+
+	Animation jump_{
+	    0.0f, // 時間
+	    40,    // アニメーションの最大時間
+	    60     // フレーム
+	};
+
+	// ジャンプ　速度
+	Vector3 velocity_ = {};
 
 	//振る舞い
 	Behavior behavior_ = Behavior::kRoot;

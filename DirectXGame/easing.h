@@ -9,3 +9,7 @@ inline float EaseInBack(float frame) {
 	float ease = (float)c3 * frame * frame * frame - (float)c1 * frame * frame;
 	return ease;
 }
+
+inline float EaseInSine(float frame) { 
+
+	return 1 - cosf((frame * (float)M_PI) / 2); }

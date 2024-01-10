@@ -15,12 +15,16 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	input_ = Input::GetInstance();
 
 	// x,y,z方向のスケーリングを設定
-	worldTransformBase_.scale_ = {1.0f, 1.0f, 1.0f};
+	worldTransformBase_.scale_ = {1.1f, 1.1f, 1.1f};
 	// x,y,z方向の回転を設定
 	worldTransformBase_.rotation_ = {0.0f, 0.0f, 0.0f};
 	// x,y,zの座標を設定
-	worldTransformBase_.translation_ = {0.0f, 2.5f, 0.0f};
+	worldTransformBase_.translation_ = {0.0f, 0.0f, 0.0f};
 
+	worldTransformHead_.scale_ = {1.1f, 1.1f, 1.1f};
+	worldTransformL_arm_.scale_ = {1.1f, 1.1f, 1.1f};
+	worldTransformR_arm_.scale_ = {1.1f, 1.1f, 1.1f};
+	
 	worldTransformHead_.translation_ = {0.0f, 1.5f, 0.0f};
 	worldTransformL_arm_.translation_ = {-0.5f, 1.3f, 0.0f};
 	worldTransformR_arm_.translation_ = {0.5f, 1.3f, 0.0f};
@@ -49,21 +53,6 @@ void Player::Initialize(const std::vector<Model*>& models) {
 }
 
 void Player::Update() {
-	
-
-#ifdef _DEBUG
-	// キャラクターの座標を画面表示する処理
-	ImGui::Begin("Debug");
-	float playerPos[] = {
-	    worldTransformBase_.translation_.x, worldTransformBase_.translation_.y,
-	    worldTransformBase_.translation_.z};
-	ImGui::SliderFloat3("PlayerPos", playerPos, 0.0f, 128.0f);
-	ImGui::End();
-
-	worldTransformBase_.translation_.x = playerPos[0];
-	worldTransformBase_.translation_.y = playerPos[1];
-	worldTransformBase_.translation_.z = playerPos[2];
-#endif // _DEBUG
 
 	if (behaviorRequest_) {
 		// 振る舞いを変更する
@@ -78,6 +67,10 @@ void Player::Update() {
 		case Behavior::kAttack:
 			// アタックビヘイビアの初期化
 			BehaviorAttackInitialize();
+			break;
+		case Behavior::kJump:
+			//ジャンプビヘイビアの初期化
+			BehaviorJumpInitialize();
 			break;
 		}
 		// 振る舞いリクエストをリセット
@@ -96,7 +89,25 @@ void Player::Update() {
 		// アタックビヘイビアの更新
 		BehaviorAttackUpdate();
 		break;
+	case Behavior::kJump:
+		//ジャンプビヘイビアの更新
+		BehaviorJumpUpdate();
+		break;
 	}
+
+	#ifdef _DEBUG
+	// キャラクターの座標を画面表示する処理
+	ImGui::Begin("Debug");
+	float playerPos[] = {
+	    worldTransformBase_.translation_.x, worldTransformBase_.translation_.y,
+	    worldTransformBase_.translation_.z};
+	ImGui::SliderFloat3("PlayerPos", playerPos, 0.0f, 128.0f);
+	ImGui::End();
+
+	worldTransformBase_.translation_.x = playerPos[0];
+	worldTransformBase_.translation_.y = playerPos[1];
+	worldTransformBase_.translation_.z = playerPos[2];
+#endif // _DEBUG
 
 	// ワールド行列の更新
 	worldTransformBase_.UpdateMatrix();
@@ -142,6 +153,7 @@ void Player::UpdateFloatingGimmick() {
 	// 浮遊を座標に反映
 	worldTransformBody_.translation_.y = std::sin(floatingParameter_) * floatingSwing;
 
+#ifdef _DEBUG
 	ImGui::Begin("Player");
 	float head[] = {
 	    worldTransformHead_.translation_.x, worldTransformHead_.translation_.y,
@@ -171,6 +183,7 @@ void Player::UpdateFloatingGimmick() {
 	worldTransformR_arm_.translation_.x = R_arm[0];
 	worldTransformR_arm_.translation_.y = R_arm[1];
 	worldTransformR_arm_.translation_.z = R_arm[2];
+#endif // _DEBUG
 }
 
 void Player::InitializeArmAnimation() { armParameter_ = 0.0f; }
@@ -206,13 +219,7 @@ void Player::BehaviorRootInitialize() {
 	worldTransformWeapon_.UpdateMatrix();
 }
 
-void Player::BehaviorAttackInitialize() { 
-	attack_.time = 0.0f; 
-}
-
 void Player::BehaviorRootUpdate() {
-	// キャラクターの移動ベクトル
-	Vector3 move = {0, 0, 0};
 
 	// キャラクターの移動速さ
 	const float kCharacterSpeed = 0.3f;
@@ -221,16 +228,16 @@ void Player::BehaviorRootUpdate() {
 
 	// 押した方向で移動ベクトルを変更(左右)
 	if (input_->PushKey(DIK_LEFT)) {
-		move.x -= kCharacterSpeed;
+		velocity_.x -= kCharacterSpeed;
 	} else if (input_->PushKey(DIK_RIGHT)) {
-		move.x += kCharacterSpeed;
+		velocity_.x += kCharacterSpeed;
 	}
 
 	// 押した方向で移動ベクトルを変更(上下)
 	if (input_->PushKey(DIK_UP)) {
-		move.z += kCharacterSpeed;
+		velocity_.z += kCharacterSpeed;
 	} else if (input_->PushKey(DIK_DOWN)) {
-		move.z -= kCharacterSpeed;
+		velocity_.z -= kCharacterSpeed;
 	}
 #pragma endregion
 
@@ -242,12 +249,12 @@ void Player::BehaviorRootUpdate() {
 	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
 
 		// 移動量
-		move = {
+		velocity_ = {
 		    (float)joyState.Gamepad.sThumbLX / SHRT_MAX * kCharacterSpeed, 0.0f,
 		    (float)joyState.Gamepad.sThumbLY / SHRT_MAX * kCharacterSpeed};
 
 		// 移動量の速さを反映
-		move = Multiply(kCharacterSpeed, Normalize(move));
+		velocity_ = Multiply(kCharacterSpeed, Normalize(velocity_));
 
 		// カメラの角度から回転行列を計算する
 		Matrix4x4 rotateXMatrix = MakeRotateXmatrix(viewProjection_->rotation_.x);
@@ -256,22 +263,27 @@ void Player::BehaviorRootUpdate() {
 		Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
 
 		// 移動量に速さを反映(0度の移動ベクトル)
-		move = Transform(move, rotateXYZMatrix);
+		velocity_ = Transform(velocity_, rotateXYZMatrix);
 
 		// Y軸周りの角度(0y)
 
-		if (/* move.y != 0 || move.z != 0*/ Length(move) != 0) {
-			worldTransformBase_.rotation_.y = std::atan2(move.x, move.z);
+		if (/* move.y != 0 || move.z != 0*/ Length(velocity_) != 0) {
+			worldTransformBase_.rotation_.y = std::atan2(velocity_.x, velocity_.z);
 		}
 
 		// 座標移動(ベクトルの加算)
-		worldTransformBase_.translation_.x += move.x;
-		worldTransformBase_.translation_.y += move.y;
-		worldTransformBase_.translation_.z += move.z;
+		worldTransformBase_.translation_.x += velocity_.x;
+		worldTransformBase_.translation_.y += velocity_.y;
+		worldTransformBase_.translation_.z += velocity_.z;
 
 		// 攻撃
-		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+		/*if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
 			behaviorRequest_ = Behavior::kAttack;
+		}*/
+
+		//ジャンプ
+		if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_B) {
+			behaviorRequest_ = Behavior::kJump;
 		}
 	}
 
@@ -285,13 +297,17 @@ void Player::BehaviorRootUpdate() {
 
 	//// 移動限界座標
 	// const float kMoveLimitX = 30;
-	// const float kMoveLimitY = 20;
+	// const float kMoveLimitZ = 20;
 
 	//// 範囲を超えない処理
 	// worldTransformBase_.translation_.x = max(worldTransformBase_.translation_.x, -kMoveLimitX);
 	// worldTransformBase_.translation_.x = min(worldTransformBase_.translation_.x, +kMoveLimitX);
-	// worldTransformBase_.translation_.y = max(worldTransformBase_.translation_.y, -kMoveLimitY);
-	// worldTransformBase_.translation_.y = min(worldTransformBase_.translation_.y, +kMoveLimitY);
+	// worldTransformBase_.translation_.z = max(worldTransformBase_.translation_.Z, -kMoveLimitZ);
+	// worldTransformBase_.translation_.z = min(worldTransformBase_.translation_.Z, +kMoveLimitZ);
+}
+
+void Player::BehaviorAttackInitialize() { 
+	attack_.time = 0.0f; 
 }
 
 void Player::BehaviorAttackUpdate() {
@@ -307,13 +323,64 @@ void Player::BehaviorAttackUpdate() {
 		worldTransformWeapon_.rotation_.x = weaponAngle;
 		worldTransformL_arm_.rotation_.x = armAngle + (float)M_PI;
 		worldTransformR_arm_.rotation_.x = armAngle + (float)M_PI;
-	} else if (attack_.time >= attack_.kAttackAllFrame) {
+	} else if (attack_.time >= attack_.kAllFrame) {
 		attack_.time = 0.0f;
 		behaviorRequest_ = Behavior::kRoot;
 		FollowCamera::SetShakeFlag(false);
 	} else if (attack_.time >= attack_.kAnimMaxTime) {
 		// アニメーションが終わったらカメラを揺らす
 		FollowCamera::SetShakeFlag(true);
+	}
+}
+
+void Player::BehaviorJumpInitialize() {
+	worldTransformBody_.translation_.y = 0;
+	worldTransformL_arm_.rotation_.x = 0;
+	worldTransformR_arm_.rotation_.x = 0;
+
+	/*worldTransformL_arm_.rotation_.x += 3.0f;
+	worldTransformR_arm_.rotation_.x += 3.0f;*/
+
+	//ジャンプ初速
+	const float kJumpFirstSpeed = 1.0f;
+	//ジャンプ初速を与える
+	velocity_.y = kJumpFirstSpeed;
+}
+
+void Player::BehaviorJumpUpdate() {
+	//移動
+	worldTransformBase_.translation_ = Add(worldTransformBase_.translation_, velocity_);
+	//重力加速度
+	const float kGravityAcceleration = 0.05f;
+	//加速度ベクトル
+	Vector3 accelerationVector = {0, -kGravityAcceleration, 0};
+	// 加速する
+	velocity_ = Add(velocity_, accelerationVector);
+
+
+	const float kDegreeToRadian = (float)M_PI / 180.0f;
+
+	jump_.time++;
+	if (jump_.time <= jump_.kAnimMaxTime) {
+		float frame = (float)(jump_.time / jump_.kAnimMaxTime);
+		float easeInSine = EaseInSine(frame * frame);
+		float armAngle = (float)((180 * kDegreeToRadian)) * easeInSine;
+		worldTransformL_arm_.rotation_.x = armAngle + (float)M_PI;
+		worldTransformR_arm_.rotation_.x = armAngle + (float)M_PI;
+	} else if (jump_.time >= jump_.kAllFrame) {
+		jump_.time = 0.0f;
+	}
+
+	//着地
+	if (worldTransformBase_.translation_.y <= 0.0f) {
+		worldTransformBase_.translation_.y = 0;
+		worldTransformL_arm_.rotation_.x = 0;
+		worldTransformR_arm_.rotation_.x = 0;
+
+		jump_.time = 0.0f;
+
+		//ジャンプ終了
+		behaviorRequest_ = Behavior::kRoot;
 	}
 }
 
@@ -326,4 +393,11 @@ Vector3 Player::GetWorldPosition() {
 	worldPos.z = worldTransformBase_.matWorld_.m[3][2];
 
 	return worldPos;
+}
+
+void Player::PositionReset() {
+	// x,y,z方向の回転を設定
+	worldTransformBase_.rotation_ = {0.0f, 0.0f, 0.0f};
+	// x,y,zの座標を設定
+	worldTransformBase_.translation_ = {0.0f, 0.0f, 0.0f};
 }
