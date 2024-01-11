@@ -40,12 +40,12 @@ public:
 public:
 	bool IsDead() const { return isDead_; }
 
-	// デスフラグ
-	bool isDead_ = false;
-
 private: // 変数
 	// ワールド変換データ
 	WorldTransform worldTransform_;
 	// モデル
 	Model* model_ = nullptr;
+
+	// デスフラグ
+	bool isDead_ = false;
 };
