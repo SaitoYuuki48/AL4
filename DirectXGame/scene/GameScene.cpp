@@ -560,6 +560,8 @@ void GameScene::sceneReset() {
 
 	player_->PositionReset();
 
+	followCamera_->CameraReset();
+
 	// 玉発生データの読み込み
 	LoadSpherePopData();
 }

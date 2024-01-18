@@ -22,6 +22,8 @@ public:
 	void SetTarget(const WorldTransform* target) { target_ = target; }
 
 	static void SetShakeFlag(bool shakeFlag) { shakeFlag_ = shakeFlag; }
+	
+	void CameraReset();
 
 private:
 	void CameraShake();

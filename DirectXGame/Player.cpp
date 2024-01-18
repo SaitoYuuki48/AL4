@@ -400,4 +400,6 @@ void Player::PositionReset() {
 	worldTransformBase_.rotation_ = {0.0f, 0.0f, 0.0f};
 	// x,y,zの座標を設定
 	worldTransformBase_.translation_ = {0.0f, 0.0f, 0.0f};
+	// 振る舞い
+	behavior_ = Behavior::kRoot;
 }

@@ -72,3 +72,10 @@ void FollowCamera::CameraShake() {
 
 	viewProjection_.translation_ = Add(rand3, viewProjection_.translation_);
 }
+
+void FollowCamera::CameraReset() {
+	// x,y,z方向の回転を設定
+	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
+	// x,y,zの方向のを設定
+	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
+}
