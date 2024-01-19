@@ -1,11 +1,13 @@
 ﻿#include "Player.h"
 #include "ImGuiManager.h"
 #include "cassert"
-#include "compute/compute.h"
 #define _USE_MATH_DEFINES
 #include "FollowCamera.h"
-#include "easing.h"
 #include <math.h>
+
+#include "easing.h"
+#include "compute/compute.h"
+#include "GlobalVariables.h"
 
 Player::Player() {}
 
@@ -43,6 +45,13 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	worldTransformL_arm_.Initialize();
 	worldTransformR_arm_.Initialize();
 	worldTransformWeapon_.Initialize();
+
+	GlobalVariables* globalVariables = GlobalVariables::GetInstance();
+	const char* groupName = "Player";
+	//グループを追加
+	GlobalVariables::GetInstance()->CreateGroup(groupName);
+
+	globalVariables->SetValue(groupName, "Test", 90);
 
 	// 浮遊ギミックの初期化
 	InitializeFloatingGimmick();
