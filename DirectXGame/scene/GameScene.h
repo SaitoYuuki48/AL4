@@ -18,6 +18,8 @@
 #include "Ground.h"
 #include "FollowCamera.h"
 
+#include "GlobalVariables.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -103,4 +105,7 @@ private: // メンバ変数
 	// Skydome* skydome_ = nullptr;
 	//   3Dモデル
 	std::unique_ptr<Model> modelGround_;
+
+	//グローバル変数
+	//GlobalVariables* globalVariables_;
 };

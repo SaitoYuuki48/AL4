@@ -3,6 +3,7 @@
 #include "AxisIndicator.h"
 #include <cassert>
 
+
 GameScene::GameScene() {}
 
 GameScene::~GameScene() {}
@@ -84,6 +85,9 @@ void GameScene::Initialize() {
 	// 軸方向表示が参照するビュープロジェクションを指定する(アドレス渡し)
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 #endif // _DEBUG
+
+	// グローバル変数
+	//globalVariables_ = GlobalVariables::GetInstance();
 }
 
 void GameScene::Update() {
@@ -130,8 +134,6 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 
-	
-
 	// 自キャラの更新
 	player_->Update();
 
@@ -143,6 +145,10 @@ void GameScene::Update() {
 
 	// 地面の更新
 	ground_->Update();
+
+	/*if (input_->TriggerKey(DIK_SPACE)) {
+		globalVariables_->SaveFile("Player");
+	}*/
 }
 
 void GameScene::Draw() {

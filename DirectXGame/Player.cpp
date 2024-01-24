@@ -52,6 +52,8 @@ void Player::Initialize(const std::vector<Model*>& models) {
 	GlobalVariables::GetInstance()->CreateGroup(groupName);
 
 	globalVariables->SetValue(groupName, "Test", 90);
+	globalVariables->SetValue(groupName, "Test2", 190);
+
 
 	// 浮遊ギミックの初期化
 	InitializeFloatingGimmick();

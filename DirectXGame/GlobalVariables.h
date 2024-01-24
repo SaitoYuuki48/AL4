@@ -5,6 +5,7 @@
 #include <map>
 
 #include "Vector3.h"
+#include <json.hpp>
 
 /// <summary>
 /// グローバル
@@ -53,6 +54,19 @@ public:
 	void SetValue(const std::string& groupName, const std::string& key, float value);
 	// 値のセット(Vector3)
 	void SetValue(const std::string& groupName, const std::string& key, const Vector3& value);
+
+	 /// <summary>
+	/// ファイルに書き出し
+	/// </summary>
+	/// <param name="groupName">グループ</param>
+	void SaveFile(const std::string& groupName);
+
+private:
+
+	using json=nlohmann::json;
+  
+	//グローバル変数の保存先ファイルパス
+	const std::string kDirectoryPath = "Resources/GlobalVariables/";
 
 private:
 	//項目
