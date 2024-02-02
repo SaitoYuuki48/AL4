@@ -185,6 +185,10 @@ void GameScene::Update() {
 			}
 		}
 	}
+
+	// フェードの更新
+	fadeColor_.w -= 0.005f;
+	fadeSprite_->SetColor(fadeColor_);
 }
 
 void GameScene::Draw() {
@@ -257,6 +261,9 @@ void GameScene::Draw() {
 	else if (gameoverFlag == true) {
 		textureGameover->Draw();
 	}
+
+	//フェードの描画
+	//fadeSprite_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -541,6 +548,10 @@ void GameScene::TextureInitialize() {
 
 	textureClear = Sprite::Create(clearHandle, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureGameover = Sprite::Create(gameoverHandle, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+
+	// フェードの初期化
+	uint32_t fadeTexHandle = TextureManager::Load("fade.png");
+	fadeSprite_ = Sprite::Create(fadeTexHandle, {0, 0});
 }
 
 

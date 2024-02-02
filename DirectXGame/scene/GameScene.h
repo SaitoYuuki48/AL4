@@ -194,6 +194,11 @@ private: // メンバ変数
 	bool clearFlag = false;
 	bool gameoverFlag = false;
 
+	//クリア
 	Sprite* textureClear;
+	//ゲームオーバー
 	Sprite* textureGameover;
+
+	Sprite* fadeSprite_ = nullptr;
+	Vector4 fadeColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
 };
