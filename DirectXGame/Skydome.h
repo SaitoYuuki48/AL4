@@ -19,6 +19,8 @@ public:
 	/// </summary>
 	void Draw(const ViewProjection& viewProjection);
 
+	void DemoUpdate();
+
 private:
 	// ワールド変換データ
 	WorldTransform worldTransform_;

@@ -20,6 +20,7 @@
 #include "Skydome.h"
 #include "Ground.h"
 #include "FollowCamera.h"
+#include "Fade.h"
 
 /// <summary>
 /// ゲームシーン
@@ -84,6 +85,8 @@ private:
 
 	// スコアの更新処理
 	void ScoreUpdate(int32_t num, int32_t kNum);
+
+	void ScoreDisplay();
 
 	//時間の処理
 	void TimerUpdate(int32_t timer);
@@ -163,6 +166,9 @@ private: // メンバ変数
 	Sprite* textureTimer1_[10];
 	Sprite* textureTimer0_[10];
 
+	//スコアの座標
+	Vector2 scorePos0 = {635.0f, 540.0f}; //{585.0f, 540.0f};
+	Vector2 scorePos1 = {585.0f, 540.0f};
 
 	//敵キャラ
 	//std::unique_ptr<Enemy> enemy_;
@@ -176,13 +182,11 @@ private: // メンバ変数
 
 	// 天球
 	std::unique_ptr<Skydome> skydome_;
-	//Skydome* skydome_ = nullptr;
 	//  3Dモデル
 	std::unique_ptr<Model> modelSkydome_;
 
 	//地面
 	std::unique_ptr<Ground> ground_;
-	// Skydome* skydome_ = nullptr;
 	//   3Dモデル
 	std::unique_ptr<Model> modelGround_;
 
@@ -199,6 +203,10 @@ private: // メンバ変数
 	//ゲームオーバー
 	Sprite* textureGameover;
 
-	Sprite* fadeSprite_ = nullptr;
-	Vector4 fadeColor_ = {1.0f, 1.0f, 1.0f, 1.0f};
+	//フェード
+	std::unique_ptr<Fade> fade_;
+
+	bool fadeTimerFlag_;
+	const float kFadeTimer_ = 1.657f * 60.0f;
+	float fadeTimer_ = kFadeTimer_;
 };

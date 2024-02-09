@@ -74,6 +74,11 @@ void GameScene::Initialize() {
 	//テクスチャの初期化
 	TextureInitialize();
 
+	// フェードの生成
+	fade_ = std::make_unique<Fade>();
+	// フェードの初期化
+	fade_->Initialize();
+
 	// デバッグカメラの生成
 	debugCamera_ = std::make_unique<DebugCamera>(1280, 720);
 
@@ -83,9 +88,15 @@ void GameScene::Initialize() {
 	// 軸方向表示が参照するビュープロジェクションを指定する(アドレス渡し)
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 #endif // _DEBUG
+
+	fade_->FadeInStart();
 }
 
 void GameScene::Update() {
+
+	// フェードの更新
+	fade_->Update();
+	
 
 	//フォローカメラ
 	followCamera_->Update();
@@ -160,16 +171,17 @@ void GameScene::Update() {
 
 	TimerUpdate(timer_);
 
-	if (sphereNum_ >= kSphereNum_){
+	/*if (sphereNum_ >= kSphereNum_){
 		clearFlag = true;
 		if (clearFlag == true) {
 			if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
-					isSceneEnd = true;
+				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A && fadeTimerFlag_ == false) {
+					fadeTimerFlag_ = true;
+					fade_->FadeOutStart();
 				}
 			}
 		}
-	} 
+	} */
 
 	if (clearFlag == false && gameoverFlag == false) {
 		timer_--;
@@ -178,17 +190,22 @@ void GameScene::Update() {
 	if (timer_ <= 0) {
 		gameoverFlag = true;
 		if (gameoverFlag == true) {
-			if (Input::GetInstance()->GetJoystickState(0, joyState)) {
+			if (Input::GetInstance()->GetJoystickState(0, joyState) && fadeTimerFlag_ == false) {
 				if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
-					isSceneEnd = true;
+					fadeTimerFlag_ = true;
+					fade_->FadeOutStart();
 				}
 			}
 		}
 	}
 
-	// フェードの更新
-	fadeColor_.w -= 0.005f;
-	fadeSprite_->SetColor(fadeColor_);
+	if (fadeTimerFlag_ == true) {
+		fadeTimer_--;
+	}
+
+	if (fadeTimer_ <= 0) {
+		isSceneEnd = true;
+	}
 }
 
 void GameScene::Draw() {
@@ -245,25 +262,28 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
-	//取得数、必要数
-	textureNumber2_[sphereNum2]->Draw();
-	textureNumber_[sphereNum1]->Draw();
-	textureSlash_->Draw();
-	textureNumber10_1_[sphereNum10_1]->Draw();
-	textureNumber10_0_[sphereNum10_0]->Draw();
-	//時間
-	textureTimer0_[timerNum0]->Draw();
-	textureTimer1_[timerNum1]->Draw();
-
-	if (clearFlag == true) {
+	/*if (clearFlag == true) {
 		textureClear->Draw();
-	} 
-	else if (gameoverFlag == true) {
+	} */
+
+	if (gameoverFlag == true) {
 		textureGameover->Draw();
+
+		textureNumber10_1_[sphereNum2]->Draw();
+		textureNumber10_0_[sphereNum1]->Draw();
+	} else {
+		// 取得数、必要数
+		textureNumber2_[sphereNum2]->Draw();
+		textureNumber_[sphereNum1]->Draw();
+		// textureSlash_->Draw();
+
+		// 時間
+		textureTimer0_[timerNum0]->Draw();
+		textureTimer1_[timerNum1]->Draw();
 	}
 
 	//フェードの描画
-	//fadeSprite_->Draw();
+	fade_->Draw();
 
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -476,48 +496,48 @@ void GameScene::TextureInitialize() {
 	textureNumber2_[9] =
 	    Sprite::Create(numHandle[9], {0.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 
+	//最終スコア
 	textureNumber10_0_[0] =
-	    Sprite::Create(numHandle[0], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[0], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[1] =
-	    Sprite::Create(numHandle[1], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[1], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[2] =
-	    Sprite::Create(numHandle[2], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[2], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[3] =
-	    Sprite::Create(numHandle[3], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[3], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[4] =
-	    Sprite::Create(numHandle[4], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[4], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[5] =
-	    Sprite::Create(numHandle[5], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[5], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[6] =
-	    Sprite::Create(numHandle[6], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[6], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[7] =
-	    Sprite::Create(numHandle[7], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[7], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[8] =
-	    Sprite::Create(numHandle[8], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[8], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_0_[9] =
-	    Sprite::Create(numHandle[9], {200.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[9], {scorePos0}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 
-	//必要数
 	textureNumber10_1_[0] =
-	    Sprite::Create(numHandle[0], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[0], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[1] =
-	    Sprite::Create(numHandle[1], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[1], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[2] =
-	    Sprite::Create(numHandle[2], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[2], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[3] =
-	    Sprite::Create(numHandle[3], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[3], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[4] =
-	    Sprite::Create(numHandle[4], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[4], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[5] =
-	    Sprite::Create(numHandle[5], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[5], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[6] =
-	    Sprite::Create(numHandle[6], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[6], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[7] =
-	    Sprite::Create(numHandle[7], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[7], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[8] =
-	    Sprite::Create(numHandle[8], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[8], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureNumber10_1_[9] =
-	    Sprite::Create(numHandle[9], {150.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
+	    Sprite::Create(numHandle[9], {scorePos1}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 
 	// 時間の画像
 	textureTimer0_[0] = Sprite::Create(numHandle[0], {1180.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
@@ -544,14 +564,10 @@ void GameScene::TextureInitialize() {
 
 	//クリア、ゲームオーバーの画像
 	uint32_t clearHandle = TextureManager::Load("./Resources/CLEAR.png");
-	uint32_t gameoverHandle = TextureManager::Load("./Resources/GAMEOVER.png");
+	uint32_t gameoverHandle = TextureManager::Load("./Resources/GAMEOVER2.png");
 
 	textureClear = Sprite::Create(clearHandle, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
 	textureGameover = Sprite::Create(gameoverHandle, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.0f, 0.0f});
-
-	// フェードの初期化
-	uint32_t fadeTexHandle = TextureManager::Load("fade.png");
-	fadeSprite_ = Sprite::Create(fadeTexHandle, {0, 0});
 }
 
 
@@ -575,4 +591,10 @@ void GameScene::sceneReset() {
 
 	// 玉発生データの読み込み
 	LoadSpherePopData();
+
+	fade_->FadeInStart();
+	
+	fadeTimerFlag_ = false;
+
+	fadeTimer_ = kFadeTimer_;
 }

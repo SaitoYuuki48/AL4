@@ -23,3 +23,7 @@ void Skydome::Update() { worldTransform_.UpdateMatrix(); }
 void Skydome::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection);
 }
+
+void Skydome::DemoUpdate() {
+	worldTransform_.rotation_.y += 0.001f;
+}

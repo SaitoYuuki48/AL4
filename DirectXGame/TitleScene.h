@@ -10,6 +10,12 @@
 #include "ViewProjection.h"
 #include "WorldTransform.h"
 
+#include "FixedCamera.h"
+
+#include "Skydome.h"
+#include "Ground.h"
+#include "Fade.h"
+
 class TitleScene {
 public:
 	/// <summary>
@@ -49,15 +55,36 @@ private: // メンバ変数
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 
+	// ビュープロジェクション
+	ViewProjection viewProjection_;
+
+	// カメラ
+	std::unique_ptr<FixedCamera> fixedCamera_; 
+
 	//切り替え用
 	static const int32_t kWaitTimer_ = 30;
 	int32_t waitTimer_ = kWaitTimer_;
 
 	bool isLule = false;
 
+	// 天球
+	std::unique_ptr<Skydome> skydome_;
+	//  3Dモデル
+	std::unique_ptr<Model> modelSkydome_;
 
+	// 地面
+	std::unique_ptr<Ground> ground_;
+	//   3Dモデル
+	std::unique_ptr<Model> modelGround_;
 
 	//  スプライト
 	Sprite* spriteTitle_ = nullptr;
 	Sprite* spriteLule_ = nullptr;
+
+	// フェード
+	std::unique_ptr<Fade> fade_;
+	bool fadeTimerFlag_;
+	const float kFadeTimer_ = 1.657f * 60.0f;
+	float fadeTimer_ = kFadeTimer_;
+
 };

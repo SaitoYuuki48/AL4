@@ -23,3 +23,5 @@ void Ground::Update() { worldTransform_.UpdateMatrix(); }
 void Ground::Draw(const ViewProjection& viewProjection) {
 	model_->Draw(worldTransform_, viewProjection);
 }
+
+void Ground::DemoUpdate() { worldTransform_.rotation_.y += 0.001f; }

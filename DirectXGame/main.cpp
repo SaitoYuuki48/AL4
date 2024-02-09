@@ -109,6 +109,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				// ゲームシーンの初期化、フラグリセット等
 				gameScene->sceneReset();
 			}
+
+			break;
 		}
 
 		// 軸表示の更新
