@@ -45,8 +45,3 @@ void Fade::FadeOutStart() {
 	fadeFlag = FadeState::kFadeOut;
 	fadeColor_.w = 0.0f;
 }
-
-void Fade::FadeReset() { 
-	
-	//fadeColor_.w = 0.0f;
-}

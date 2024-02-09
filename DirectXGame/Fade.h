@@ -31,8 +31,6 @@ public:
 
 	void FadeOutStart();
 
-	void FadeReset();
-
 private:
 	Sprite* fadeSprite_ = nullptr;
 	Vector4 fadeColor_ = {1.0f, 1.0f, 1.0f, 0.0f};
